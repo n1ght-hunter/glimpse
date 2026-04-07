@@ -1,6 +1,8 @@
 [workspace]
 resolver = "3"
 members = ["crates/*"]
+# Platform-specific crates that can't build on all hosts
+exclude = ["crates/scap-mac", "crates/scap-linux"]
 
 [workspace.package]
 edition = "2024"
@@ -8,8 +10,12 @@ license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
 # Local crates
+glimpse = { path = "crates/glimpse" }
 glimpse_core = { path = "crates/core" }
 glimpse_scap = { path = "crates/scap" }
+glimpse_scap_win = { path = "crates/scap-win" }
+glimpse_scap_mac = { path = "crates/scap-mac" }
+glimpse_scap_linux = { path = "crates/scap-linux" }
 glimpse_obs_hook = { path = "crates/obs-hook" }
 
 # Shared

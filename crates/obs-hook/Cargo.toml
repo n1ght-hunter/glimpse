@@ -13,3 +13,7 @@ toml.workspace = true
 serde.workspace = true
 ureq.workspace = true
 zip.workspace = true
+glimpse_core = { workspace = true, optional = true }
+
+[features]
+core = ["dep:glimpse_core"]

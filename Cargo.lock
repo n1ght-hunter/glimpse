@@ -599,6 +599,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "glimpse"
+version = "0.1.0"
+dependencies = [
+ "glimpse_core",
+ "glimpse_obs_hook",
+ "glimpse_scap_win",
+]
+
+[[package]]
 name = "glimpse_core"
 version = "0.1.0"
 dependencies = [
@@ -609,6 +618,7 @@ dependencies = [
 name = "glimpse_obs_hook"
 version = "0.1.0"
 dependencies = [
+ "glimpse_core",
  "serde",
  "thiserror 2.0.18",
  "toml 1.1.2+spec-1.1.0",
@@ -633,6 +643,18 @@ dependencies = [
  "pipewire",
  "rand",
  "sysinfo",
+ "thiserror 2.0.18",
+ "tracing",
+ "windows 0.61.3",
+ "windows-capture",
+]
+
+[[package]]
+name = "glimpse_scap_win"
+version = "0.1.0"
+dependencies = [
+ "cpal",
+ "glimpse_core",
  "thiserror 2.0.18",
  "tracing",
  "windows 0.61.3",

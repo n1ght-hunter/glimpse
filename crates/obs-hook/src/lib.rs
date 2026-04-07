@@ -16,3 +16,8 @@ pub use dx::Frame;
 pub use error::{Error, Result};
 pub use hook::WindowTarget;
 pub use types::{Bgra8, GraphicOffsets, HookInfo};
+
+#[cfg(feature = "core")]
+mod stream;
+#[cfg(feature = "core")]
+pub use stream::ObsGameCapture;
