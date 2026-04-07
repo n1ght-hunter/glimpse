@@ -2,7 +2,7 @@ use std::{
     mem::size_of,
     sync::{
         atomic::{AtomicBool, AtomicU8},
-        mpsc::{self, sync_channel, SyncSender},
+        mpsc::{self, SyncSender, sync_channel},
     },
     thread::JoinHandle,
     time::Duration,
@@ -16,13 +16,13 @@ use pw::{
     spa::{
         self,
         param::{
+            ParamType,
             format::{FormatProperties, MediaSubtype, MediaType},
             video::VideoFormat,
-            ParamType,
         },
         pod::{Pod, Property},
         sys::{
-            spa_buffer, spa_meta_header, SPA_META_Header, SPA_PARAM_META_size, SPA_PARAM_META_type,
+            SPA_META_Header, SPA_PARAM_META_size, SPA_PARAM_META_type, spa_buffer, spa_meta_header,
         },
         utils::{Direction, SpaTypes},
     },
