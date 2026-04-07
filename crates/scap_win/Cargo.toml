@@ -9,6 +9,6 @@ license.workspace = true
 glimpse_core.workspace = true
 windows.workspace = true
 windows-capture = "1.5.0"
-cpal = "0.15.2"
+cpal = "0.17"
 tracing.workspace = true
 thiserror.workspace = true

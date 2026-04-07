@@ -221,6 +221,6 @@ pub fn wait_for_event(handle: &OwnedHandle, timeout_ms: u32) -> Result<()> {
     } else if result == WAIT_TIMEOUT {
         Err(Error::HookTimeout { timeout_ms })
     } else {
-        Err(Error::Windows(windows::core::Error::from_win32()))
+        Err(Error::Windows(windows::core::Error::from_thread()))
     }
 }

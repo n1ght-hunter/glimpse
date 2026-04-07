@@ -231,7 +231,13 @@ impl<'a> ScreenCastPortal<'a> {
             Duration::from_secs(4),
         );
 
-        let token = format!("scap_{}", rand::random::<u16>());
+        let token = {
+            use std::hash::{Hash, Hasher};
+            let mut hasher = std::hash::DefaultHasher::new();
+            std::process::id().hash(&mut hasher);
+            std::time::Instant::now().hash(&mut hasher);
+            format!("scap_{}", hasher.finish() as u16)
+        };
 
         Self {
             proxy,

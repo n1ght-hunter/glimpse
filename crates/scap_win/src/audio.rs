@@ -59,7 +59,7 @@ fn build_audio_stream(
                 let sample_tx = sample_tx.clone();
                 move |data, info: &cpal::InputCallbackInfo| {
                     sample_tx
-                        .send(Ok((data.bytes().to_vec(), info.clone(), SystemTime::now())))
+                        .send(Ok((data.bytes().to_vec(), *info, SystemTime::now())))
                         .unwrap();
                 }
             },
@@ -135,7 +135,7 @@ pub fn spawn_audio_stream(
                 false,
                 data,
                 sample_count,
-                config.sample_rate().0,
+                config.sample_rate(),
                 timestamp,
             );
 

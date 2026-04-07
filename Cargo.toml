@@ -10,7 +10,6 @@ license = "MIT OR Apache-2.0"
 # Local crates
 glimpse = { path = "crates/glimpse" }
 glimpse_core = { path = "crates/core" }
-glimpse_scap = { path = "crates/scap" }
 glimpse_scap_win = { path = "crates/scap_win" }
 glimpse_scap_mac = { path = "crates/scap_mac" }
 glimpse_scap_linux = { path = "crates/scap_linux" }
@@ -27,13 +26,13 @@ toml = "1.1.2"
 
 # HTTP / Archive
 ureq = "3"
-zip = { version = "4", default-features = false, features = ["deflate"] }
+zip = { version = "8", default-features = false, features = ["deflate"] }
 
 # System
-sysinfo = "0.30"
+sysinfo = "0.38"
 
 # Windows
-windows = { version = "0.61", features = [
+windows = { version = "0.62", features = [
     "Win32_Foundation",
     "Win32_Graphics_Gdi",
     "Win32_Graphics_Direct3D",
