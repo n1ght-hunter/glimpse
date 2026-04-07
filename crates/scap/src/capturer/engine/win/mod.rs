@@ -412,7 +412,7 @@ fn spawn_audio_stream(
             }
         }
 
-        let audio_format = AudioFormat::from(config.sample_format());
+        let audio_format = crate::frame::audio_format_from_cpal(config.sample_format());
 
         loop {
             match ctrl_rx.try_recv() {

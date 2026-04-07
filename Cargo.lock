@@ -628,6 +628,7 @@ dependencies = [
  "cpal",
  "dbus",
  "futures",
+ "glimpse_core",
  "objc",
  "pipewire",
  "rand",

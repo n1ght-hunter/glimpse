@@ -10,6 +10,7 @@ authors = [
 ]
 
 [dependencies]
+glimpse_core.workspace = true
 futures.workspace = true
 sysinfo.workspace = true
 thiserror.workspace = true
