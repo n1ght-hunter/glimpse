@@ -1,4 +1,4 @@
-use cidre::{cg, ns, sc};
+use cidre::{cg, sc};
 use cocoa::appkit::{NSApp, NSScreen};
 use cocoa::base::{id, nil};
 use cocoa::foundation::{NSRect, NSString, NSUInteger};
@@ -8,31 +8,28 @@ use objc::{msg_send, sel, sel_impl};
 use crate::ext::DirectDisplayIdExt;
 use glimpse_core::{Display, RawHandle, Target, Window};
 
-/// Typed access to the underlying `CGDirectDisplayID` for a [`Display`].
 pub trait DisplayExt {
     fn direct_display_id(&self) -> cg::DirectDisplayId;
 }
 
 impl DisplayExt for Display {
     fn direct_display_id(&self) -> cg::DirectDisplayId {
-        cg::DirectDisplayId(self.raw_handle.0 as u32)
+        cg::direct_display::Id(self.raw_handle.0 as u32)
     }
 }
 
-/// Typed access to the underlying `CGWindowID` for a [`Window`].
 pub trait WindowExt {
-    fn cg_window_id(&self) -> cg::WindowId;
+    fn cg_window_id(&self) -> u32;
 }
 
 impl WindowExt for Window {
-    fn cg_window_id(&self) -> cg::WindowId {
-        cg::WindowId(self.raw_handle.0 as u32)
+    fn cg_window_id(&self) -> u32 {
+        self.raw_handle.0 as u32
     }
 }
 
 fn get_display_name(display_id: cg::DirectDisplayId) -> String {
     unsafe {
-        // Get all screens
         let screens: id = NSScreen::screens(nil);
         let count: u64 = msg_send![screens, count];
 
@@ -60,57 +57,51 @@ pub fn get_all_targets() -> Vec<Target> {
 
     let content = block_on(sc::ShareableContent::current()).unwrap();
 
-    // Add displays to targets
     for display in content.displays().iter() {
-        let id = display.display_id();
-        let title = get_display_name(id);
-        let mode = id.display_mode();
+        let did = display.display_id();
+        let title = get_display_name(did);
+        let mode = did.display_mode();
         let (width, height) = mode
             .map(|m| (m.width() as u32, m.height() as u32))
             .unwrap_or((0, 0));
 
-        let target = Target::Display(Display {
-            id: id.0,
+        targets.push(Target::Display(Display {
+            id: did.0,
             title,
-            raw_handle: RawHandle(id.0 as isize),
+            raw_handle: RawHandle(did.0 as isize),
             width,
             height,
-        });
-
-        targets.push(target);
+        }));
     }
 
-    // Add windows to targets
     for window in content.windows().iter() {
-        let id = window.id();
+        let wid = window.id();
         let title = window
             .title()
-            // on intel chips we can have Some but also a null pointer for some reason
             .filter(|v| !unsafe { v.utf8_chars_ar().is_null() });
 
-        let target = Target::Window(Window {
-            id,
+        targets.push(Target::Window(Window {
+            id: wid,
             title: title.map(|v| v.to_string()).unwrap_or_default(),
-            raw_handle: RawHandle(id as isize),
-        });
-        targets.push(target);
+            raw_handle: RawHandle(wid as isize),
+        }));
     }
 
     targets
 }
 
 pub fn get_main_display() -> Display {
-    let id = cg::direct_display::Id::main();
-    let title = get_display_name(id);
-    let mode = id.display_mode();
+    let did = cg::direct_display::Id::main();
+    let title = get_display_name(did);
+    let mode = did.display_mode();
     let (width, height) = mode
         .map(|m| (m.width() as u32, m.height() as u32))
         .unwrap_or((0, 0));
 
     Display {
-        id: id.0,
+        id: did.0,
         title,
-        raw_handle: RawHandle(id.0 as isize),
+        raw_handle: RawHandle(did.0 as isize),
         width,
         height,
     }
@@ -119,9 +110,9 @@ pub fn get_main_display() -> Display {
 pub fn get_scale_factor(target: &Target) -> f64 {
     match target {
         Target::Window(window) => unsafe {
-            let cg_win_id = window.cg_window_id().0;
+            let wid = window.cg_window_id();
             let ns_app: id = NSApp();
-            let ns_window: id = msg_send![ns_app, windowWithWindowNumber: cg_win_id as NSUInteger];
+            let ns_window: id = msg_send![ns_app, windowWithWindowNumber: wid as NSUInteger];
             let scale_factor: f64 = msg_send![ns_window, backingScaleFactor];
             scale_factor
         },
@@ -135,9 +126,9 @@ pub fn get_scale_factor(target: &Target) -> f64 {
 pub fn get_target_dimensions(target: &Target) -> (u64, u64) {
     match target {
         Target::Window(window) => unsafe {
-            let cg_win_id = window.cg_window_id().0;
+            let wid = window.cg_window_id();
             let ns_app: id = NSApp();
-            let ns_window: id = msg_send![ns_app, windowWithWindowNumber: cg_win_id as NSUInteger];
+            let ns_window: id = msg_send![ns_app, windowWithWindowNumber: wid as NSUInteger];
             let frame: NSRect = msg_send![ns_window, frame];
             (frame.size.width as u64, frame.size.height as u64)
         },

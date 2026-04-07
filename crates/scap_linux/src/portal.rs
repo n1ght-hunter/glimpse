@@ -48,7 +48,7 @@ impl<'a, T: blocking::BlockingSender, C: ::std::ops::Deref<Target = T>>
             "CreateSession",
             (options,),
         )
-        .and_then(|r: (dbus::Path<'static>,)| Ok(r.0))
+        .map(|r: (dbus::Path<'static>,)| r.0)
     }
 
     fn select_sources(
@@ -61,7 +61,7 @@ impl<'a, T: blocking::BlockingSender, C: ::std::ops::Deref<Target = T>>
             "SelectSources",
             (session_handle, options),
         )
-        .and_then(|r: (dbus::Path<'static>,)| Ok(r.0))
+        .map(|r: (dbus::Path<'static>,)| r.0)
     }
 
     fn start(
@@ -75,7 +75,7 @@ impl<'a, T: blocking::BlockingSender, C: ::std::ops::Deref<Target = T>>
             "Start",
             (session_handle, parent_window, options),
         )
-        .and_then(|r: (dbus::Path<'static>,)| Ok(r.0))
+        .map(|r: (dbus::Path<'static>,)| r.0)
     }
 
     fn open_pipe_wire_remote(
@@ -88,12 +88,12 @@ impl<'a, T: blocking::BlockingSender, C: ::std::ops::Deref<Target = T>>
             "OpenPipeWireRemote",
             (session_handle, options),
         )
-        .and_then(|r: (arg::OwnedFd,)| Ok(r.0))
+        .map(|r: (arg::OwnedFd,)| r.0)
     }
 
     fn available_source_types(&self) -> Result<u32, dbus::Error> {
         <Self as blocking::stdintf::org_freedesktop_dbus::Properties>::get(
-            &self,
+            self,
             "org.freedesktop.portal.ScreenCast",
             "AvailableSourceTypes",
         )
@@ -101,7 +101,7 @@ impl<'a, T: blocking::BlockingSender, C: ::std::ops::Deref<Target = T>>
 
     fn available_cursor_modes(&self) -> Result<u32, dbus::Error> {
         <Self as blocking::stdintf::org_freedesktop_dbus::Properties>::get(
-            &self,
+            self,
             "org.freedesktop.portal.ScreenCast",
             "AvailableCursorModes",
         )
@@ -109,7 +109,7 @@ impl<'a, T: blocking::BlockingSender, C: ::std::ops::Deref<Target = T>>
 
     fn version(&self) -> Result<u32, dbus::Error> {
         <Self as blocking::stdintf::org_freedesktop_dbus::Properties>::get(
-            &self,
+            self,
             "org.freedesktop.portal.ScreenCast",
             "version",
         )
@@ -282,7 +282,7 @@ impl<'a> ScreenCastPortal<'a> {
         let got_response_clone = Arc::clone(&got_response);
 
         let mut rule = MatchRule::new();
-        rule.path = Some(dbus::Path::from(path));
+        rule.path = Some(path);
         rule.msg_type = Some(dbus::MessageType::Signal);
         rule.sender = Some(BusName::from("org.freedesktop.portal.Desktop"));
         rule.interface = Some(Interface::from("org.freedesktop.portal.Request"));
@@ -307,7 +307,7 @@ impl<'a> ScreenCastPortal<'a> {
         Ok(())
     }
 
-    fn create_session(&self) -> Result<dbus::Path, LinCapError> {
+    fn create_session(&self) -> Result<dbus::Path<'_>, LinCapError> {
         let request_handle = self.proxy.create_session(self.create_session_args())?;
 
         let response = Arc::new(Mutex::new(None));

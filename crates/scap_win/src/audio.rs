@@ -35,10 +35,10 @@ pub enum CreateAudioError {
     BuildAudioStream(cpal::BuildStreamError),
 }
 
+type AudioSample = Result<(Vec<u8>, cpal::InputCallbackInfo, SystemTime), cpal::StreamError>;
+
 fn build_audio_stream(
-    sample_tx: mpsc::Sender<
-        Result<(Vec<u8>, cpal::InputCallbackInfo, SystemTime), cpal::StreamError>,
-    >,
+    sample_tx: mpsc::Sender<AudioSample>,
 ) -> Result<(cpal::Stream, cpal::SupportedStreamConfig), CreateAudioError> {
     let host = cpal::default_host();
     let output_device = host

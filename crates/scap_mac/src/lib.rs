@@ -18,7 +18,7 @@ use cidre::{arc, cm, sc};
 
 use glimpse_core::Target;
 use glimpse_core::capture::CaptureStream;
-use glimpse_core::frame::{Frame, FrameType};
+use glimpse_core::frame::Frame;
 
 pub use ext::DirectDisplayIdExt;
 pub use platform::MacPlatform;
@@ -36,8 +36,8 @@ pub struct MacCaptureOptions {
 
 /// macOS screen capture stream backed by ScreenCaptureKit.
 pub struct MacScreenCapture {
-    capturer: arc::R<engine::Capturer>,
-    error_handler: arc::R<engine::ErrorHandler>,
+    _capturer: arc::R<engine::Capturer>,
+    _error_handler: arc::R<engine::ErrorHandler>,
     stream: arc::R<sc::Stream>,
     error_flag: Arc<AtomicBool>,
     rx: mpsc::Receiver<ChannelItem>,
@@ -64,8 +64,8 @@ impl MacScreenCapture {
             engine::create_capturer(&options, tx, error_flag.clone())?;
 
         Ok(Self {
-            capturer,
-            error_handler,
+            _capturer: capturer,
+            _error_handler: error_handler,
             stream,
             error_flag,
             rx,

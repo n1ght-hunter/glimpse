@@ -54,7 +54,9 @@ fn main() -> glimpse_obs_hook::Result<()> {
     encoder.set_depth(png::BitDepth::Eight);
 
     let mut writer = encoder.write_header().expect("failed to write PNG header");
-    writer.write_image_data(&rgba).expect("failed to write PNG data");
+    writer
+        .write_image_data(&rgba)
+        .expect("failed to write PNG data");
 
     println!("saved to {path}");
     Ok(())

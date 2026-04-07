@@ -1,10 +1,9 @@
-use ::windows::Win32::System::Performance::{QueryPerformanceCounter, QueryPerformanceFrequency};
 use glimpse_core::Target;
 use glimpse_core::frame::{BGRAFrame, Frame, FrameType, RGBxFrame, VideoFrame};
 use glimpse_core::geometry::{Area, Point, Resolution, Size};
+use std::cmp;
 use std::sync::mpsc;
 use std::time::SystemTime;
-use std::{cmp, time::Duration};
 use windows_capture::{
     capture::{CaptureControl, Context, GraphicsCaptureApiHandler},
     frame::Frame as WCFrame,
@@ -26,8 +25,6 @@ struct FrameHandler {
     pub tx: mpsc::Sender<Frame>,
     pub crop: Option<Area>,
     pub color_format: ColorFormat,
-    pub start_time: (i64, SystemTime),
-    pub perf_freq: i64,
 }
 
 #[derive(Clone)]
@@ -51,19 +48,6 @@ impl GraphicsCaptureApiHandler for FrameHandler {
             tx: context.flags.tx,
             crop: context.flags.crop,
             color_format: context.flags.color_format,
-            start_time: (
-                unsafe {
-                    let mut time = 0;
-                    let _ = QueryPerformanceCounter(&mut time);
-                    time
-                },
-                SystemTime::now(),
-            ),
-            perf_freq: unsafe {
-                let mut freq = 0;
-                let _ = QueryPerformanceFrequency(&mut freq);
-                freq
-            },
         })
     }
 

@@ -79,31 +79,30 @@ fn state_changed_callback(
     _old: StreamState,
     new: StreamState,
 ) {
-    match new {
-        StreamState::Error(e) => {
-            tracing::error!("pipewire: State changed to error({e})");
-            STREAM_STATE_CHANGED_TO_ERROR.store(true, std::sync::atomic::Ordering::Relaxed);
-        }
-        _ => {}
+    if let StreamState::Error(e) = new {
+        tracing::error!("pipewire: State changed to error({e})");
+        STREAM_STATE_CHANGED_TO_ERROR.store(true, std::sync::atomic::Ordering::Relaxed);
     }
 }
 
 unsafe fn get_timestamp(buffer: *mut spa_buffer) -> i64 {
-    let n_metas = (*buffer).n_metas;
-    if n_metas > 0 {
-        let mut meta_ptr = (*buffer).metas;
-        let metas_end = (*buffer).metas.wrapping_add(n_metas as usize);
-        while meta_ptr != metas_end {
-            if (*meta_ptr).type_ == SPA_META_Header {
-                let meta_header: &mut spa_meta_header =
-                    &mut *((*meta_ptr).data as *mut spa_meta_header);
-                return meta_header.pts;
+    unsafe {
+        let n_metas = (*buffer).n_metas;
+        if n_metas > 0 {
+            let mut meta_ptr = (*buffer).metas;
+            let metas_end = (*buffer).metas.wrapping_add(n_metas as usize);
+            while meta_ptr != metas_end {
+                if (*meta_ptr).type_ == SPA_META_Header {
+                    let meta_header: &mut spa_meta_header =
+                        &mut *((*meta_ptr).data as *mut spa_meta_header);
+                    return meta_header.pts;
+                }
+                meta_ptr = meta_ptr.wrapping_add(1);
             }
-            meta_ptr = meta_ptr.wrapping_add(1);
+            0
+        } else {
+            0
         }
-        0
-    } else {
-        0
     }
 }
 
@@ -366,6 +365,7 @@ impl LinuxCapturer {
 
     pub fn stop_capture(&mut self) {
         CAPTURER_STATE.store(2, std::sync::atomic::Ordering::Relaxed);
+        #[allow(clippy::collapsible_if)]
         if let Some(handle) = self.capturer_join_handle.take() {
             if let Err(e) = handle.join().expect("Failed to join capturer thread") {
                 tracing::error!("Error occurred capturing: {e}");

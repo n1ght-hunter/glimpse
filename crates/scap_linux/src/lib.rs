@@ -6,6 +6,7 @@
 mod engine;
 pub mod error;
 pub mod platform;
+#[allow(dead_code)]
 pub mod portal;
 pub mod targets;
 
