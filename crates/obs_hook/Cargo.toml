@@ -15,5 +15,9 @@ ureq.workspace = true
 zip.workspace = true
 glimpse_core = { workspace = true, optional = true }
 
+[dev-dependencies]
+png = "0.17"
+tracing-subscriber = "0.3"
+
 [features]
 core = ["dep:glimpse_core"]

@@ -1,13 +1,6 @@
 [workspace]
 resolver = "3"
 members = ["crates/*"]
-default-members = [
-    "crates/core",
-    "crates/glimpse",
-    "crates/obs-hook",
-    "crates/scap",
-    "crates/scap-win",
-]
 
 [workspace.package]
 edition = "2024"
@@ -18,10 +11,10 @@ license = "MIT OR Apache-2.0"
 glimpse = { path = "crates/glimpse" }
 glimpse_core = { path = "crates/core" }
 glimpse_scap = { path = "crates/scap" }
-glimpse_scap_win = { path = "crates/scap-win" }
-glimpse_scap_mac = { path = "crates/scap-mac" }
-glimpse_scap_linux = { path = "crates/scap-linux" }
-glimpse_obs_hook = { path = "crates/obs-hook" }
+glimpse_scap_win = { path = "crates/scap_win" }
+glimpse_scap_mac = { path = "crates/scap_mac" }
+glimpse_scap_linux = { path = "crates/scap_linux" }
+glimpse_obs_hook = { path = "crates/obs_hook" }
 
 # Shared
 thiserror = "2"
