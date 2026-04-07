@@ -2,6 +2,7 @@ use std::sync::mpsc;
 
 use super::Options;
 use crate::frame::Frame;
+use crate::targets::Target;
 
 #[cfg(target_os = "macos")]
 pub mod mac;
@@ -40,6 +41,7 @@ pub fn get_output_frame_size(options: &Options) -> [u32; 2] {
 
 pub struct Engine {
     options: Options,
+    target: Option<Target>,
 
     #[cfg(target_os = "macos")]
     mac: (
@@ -67,6 +69,7 @@ impl Engine {
             Engine {
                 mac,
                 error_flag,
+                target: options.target.clone(),
                 options: (*options).clone(),
             }
         }
@@ -76,6 +79,7 @@ impl Engine {
             let win = win::create_capturer(&options, tx).unwrap();
             return Engine {
                 win,
+                target: options.target.clone(),
                 options: (*options).clone(),
             };
         }
@@ -85,6 +89,7 @@ impl Engine {
             let linux = linux::create_capturer(&options, tx);
             return Engine {
                 linux,
+                target: options.target.clone(),
                 options: (*options).clone(),
             };
         }
@@ -126,6 +131,10 @@ impl Engine {
         {
             self.linux.stop_capture();
         }
+    }
+
+    pub fn target(&self) -> Option<&Target> {
+        self.target.as_ref()
     }
 
     pub fn get_output_frame_size(&mut self) -> [u32; 2] {

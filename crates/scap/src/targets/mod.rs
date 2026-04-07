@@ -30,9 +30,26 @@ pub struct Display {
     #[cfg(target_os = "windows")]
     pub raw_handle: windows::Win32::Graphics::Gdi::HMONITOR,
 
+    #[cfg(target_os = "windows")]
+    pub width: u32,
+    #[cfg(target_os = "windows")]
+    pub height: u32,
+
     #[cfg(target_os = "macos")]
     pub raw_handle: cidre::cg::DirectDisplayId,
 }
+
+#[cfg(target_os = "windows")]
+// SAFETY: HWND is a raw window handle safe to send across threads
+unsafe impl Send for Window {}
+#[cfg(target_os = "windows")]
+unsafe impl Sync for Window {}
+
+#[cfg(target_os = "windows")]
+// SAFETY: HMONITOR is a raw monitor handle safe to send across threads
+unsafe impl Send for Display {}
+#[cfg(target_os = "windows")]
+unsafe impl Sync for Display {}
 
 #[derive(Debug, Clone)]
 pub enum Target {

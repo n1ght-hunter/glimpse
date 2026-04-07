@@ -1,6 +1,6 @@
 use crate::{
     capturer::{Area, Options, Point, Resolution, Size},
-    frame::{AudioFormat, AudioFrame, BGRAFrame, Frame, FrameType, VideoFrame},
+    frame::{AudioFormat, AudioFrame, BGRAFrame, Frame, FrameType, RGBxFrame, VideoFrame},
     targets::{self, get_scale_factor, Target},
 };
 use ::windows::Win32::System::Performance::{QueryPerformanceCounter, QueryPerformanceFrequency};
@@ -31,6 +31,7 @@ use windows_capture::{
 struct Capturer {
     pub tx: mpsc::Sender<Frame>,
     pub crop: Option<Area>,
+    pub color_format: ColorFormat,
     pub start_time: (i64, SystemTime),
     pub perf_freq: i64,
 }
@@ -55,6 +56,7 @@ impl GraphicsCaptureApiHandler for Capturer {
         Ok(Self {
             tx: context.flags.tx,
             crop: context.flags.crop,
+            color_format: context.flags.color_format,
             start_time: (
                 unsafe {
                     let mut time = 0;
@@ -78,63 +80,64 @@ impl GraphicsCaptureApiHandler for Capturer {
     ) -> Result<(), Self::Error> {
         let display_time = SystemTime::now();
 
-        match &self.crop {
+        let (width, height, data) = match &self.crop {
             Some(cropped_area) => {
-                // get the cropped area
                 let start_x = cropped_area.origin.x as u32;
                 let start_y = cropped_area.origin.y as u32;
                 let end_x = (cropped_area.origin.x + cropped_area.size.width) as u32;
                 let end_y = (cropped_area.origin.y + cropped_area.size.height) as u32;
 
-                // crop the frame
                 let mut cropped_buffer = frame
                     .buffer_crop(start_x, start_y, end_x, end_y)
                     .expect("Failed to crop buffer");
 
-                // get raw frame buffer
                 let raw_frame_buffer = match cropped_buffer.as_nopadding_buffer() {
                     Ok(buffer) => buffer,
                     Err(_) => return Err(("Failed to get raw buffer").into()),
                 };
 
-                let current_time = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .expect("Failed to get current time")
-                    .as_nanos() as u64;
-
-                let bgr_frame = BGRAFrame {
-                    display_time,
-                    width: cropped_area.size.width as i32,
-                    height: cropped_area.size.height as i32,
-                    data: raw_frame_buffer.to_vec(),
-                };
-
-                let _ = self.tx.send(Frame::Video(VideoFrame::BGRA(bgr_frame)));
+                (
+                    cropped_area.size.width as i32,
+                    cropped_area.size.height as i32,
+                    raw_frame_buffer.to_vec(),
+                )
             }
             None => {
-                // get raw frame buffer
+                let width = frame.width() as i32;
+                let height = frame.height() as i32;
                 let mut frame_buffer = frame.buffer().unwrap();
                 let raw_frame_buffer = frame_buffer.as_raw_buffer();
-                let frame_data = raw_frame_buffer.to_vec();
-                let current_time = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .expect("Failed to get current time")
-                    .as_nanos() as u64;
-                let bgr_frame = BGRAFrame {
-                    display_time,
-                    width: frame.width() as i32,
-                    height: frame.height() as i32,
-                    data: frame_data,
-                };
-
-                let _ = self.tx.send(Frame::Video(VideoFrame::BGRA(bgr_frame)));
+                (width, height, raw_frame_buffer.to_vec())
             }
-        }
+        };
+
+        let video_frame = match self.color_format {
+            ColorFormat::Bgra8 => VideoFrame::BGRA(BGRAFrame {
+                display_time,
+                width,
+                height,
+                data,
+            }),
+            ColorFormat::Rgba8 => VideoFrame::RGBx(RGBxFrame {
+                display_time,
+                width,
+                height,
+                data,
+            }),
+            _ => VideoFrame::BGRA(BGRAFrame {
+                display_time,
+                width,
+                height,
+                data,
+            }),
+        };
+
+        let _ = self.tx.send(Frame::Video(video_frame));
         Ok(())
     }
 
     fn on_closed(&mut self) -> Result<(), Self::Error> {
-        println!("Closed");
+        tracing::debug!("Screen capture stream closed");
         Ok(())
     }
 }
@@ -167,6 +170,7 @@ impl WCStream {
 struct FlagStruct {
     pub tx: mpsc::Sender<Frame>,
     pub crop: Option<Area>,
+    pub color_format: ColorFormat,
 }
 
 #[derive(Debug)]
@@ -215,6 +219,7 @@ pub fn create_capturer(
             FlagStruct {
                 tx: tx.clone(),
                 crop: Some(get_crop_area(options)),
+                color_format,
             },
         )),
         Target::Window(window) => Settings::Window(WCSettings::new(
@@ -228,6 +233,7 @@ pub fn create_capturer(
             FlagStruct {
                 tx: tx.clone(),
                 crop: Some(get_crop_area(options)),
+                color_format,
             },
         )),
     };

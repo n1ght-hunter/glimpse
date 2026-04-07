@@ -7,7 +7,7 @@ mod utils;
 
 // Helper Methods
 pub use targets::{get_all_targets, get_main_display};
-pub use targets::{Display, Target};
+pub use targets::{Display, Target, Window};
 pub use utils::has_permission;
 pub use utils::is_supported;
 pub use utils::request_permission;

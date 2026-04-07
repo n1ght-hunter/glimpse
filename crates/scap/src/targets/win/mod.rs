@@ -6,6 +6,14 @@ use windows::Win32::{
 };
 use windows_capture::{monitor::Monitor, window::Window};
 
+fn monitor_title(monitor: &Monitor) -> String {
+    monitor
+        .name()
+        .or_else(|_| monitor.device_string())
+        .or_else(|_| monitor.device_name())
+        .unwrap_or_default()
+}
+
 pub fn get_all_targets() -> Vec<Target> {
     let mut targets: Vec<Target> = Vec::new();
 
@@ -13,12 +21,14 @@ pub fn get_all_targets() -> Vec<Target> {
     let displays = Monitor::enumerate().expect("Failed to enumerate monitors");
     for display in displays {
         let id = display.as_raw_hmonitor() as u32;
-        let title = display.device_name().expect("Failed to get monitor name");
+        let title = monitor_title(&display);
 
         let target = Target::Display(super::Display {
             id,
             title,
             raw_handle: HMONITOR(display.as_raw_hmonitor()),
+            width: display.width().unwrap_or(0),
+            height: display.height().unwrap_or(0),
         });
         targets.push(target);
     }
@@ -46,8 +56,10 @@ pub fn get_main_display() -> Display {
 
     Display {
         id,
-        title: display.device_name().expect("Failed to get monitor name"),
+        title: monitor_title(&display),
         raw_handle: HMONITOR(display.as_raw_hmonitor()),
+        width: display.width().unwrap_or(0),
+        height: display.height().unwrap_or(0),
     }
 }
 

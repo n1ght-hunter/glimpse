@@ -44,7 +44,7 @@ impl sc::stream::DelegateImpl for ErrorHandler {
         stream: &sc::Stream,
         error: &ns::Error,
     ) {
-        eprintln!("Screen capture error occurred.");
+        tracing::error!("Screen capture error occurred");
         self.inner_mut()
             .error_flag
             .store(true, std::sync::atomic::Ordering::Relaxed);

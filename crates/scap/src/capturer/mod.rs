@@ -140,6 +140,11 @@ impl Capturer {
         }
     }
 
+    /// Returns the target being captured, if one was specified
+    pub fn target(&self) -> Option<&Target> {
+        self.engine.target()
+    }
+
     /// Get the dimensions the frames will be captured in
     pub fn get_output_frame_size(&mut self) -> [u32; 2] {
         self.engine.get_output_frame_size()

@@ -84,7 +84,7 @@ fn state_changed_callback(
 ) {
     match new {
         StreamState::Error(e) => {
-            eprintln!("pipewire: State changed to error({e})");
+            tracing::error!("pipewire: State changed to error({e})");
             STREAM_STATE_CHANGED_TO_ERROR.store(true, std::sync::atomic::Ordering::Relaxed);
         }
         _ => {}
@@ -160,11 +160,11 @@ fn process_callback(stream: &StreamRef, user_data: &mut ListenerUserData) {
                 })),
                 _ => panic!("Unsupported frame format received"),
             } {
-                eprintln!("{e}");
+                tracing::error!("Failed to send frame: {e}");
             }
         }
     } else {
-        eprintln!("Out of buffers");
+        tracing::warn!("Out of buffers");
     }
 
     unsafe { stream.queue_raw_buffer(buffer) };
@@ -356,7 +356,7 @@ impl LinuxCapturer {
         CAPTURER_STATE.store(2, std::sync::atomic::Ordering::Relaxed);
         if let Some(handle) = self.capturer_join_handle.take() {
             if let Err(e) = handle.join().expect("Failed to join capturer thread") {
-                eprintln!("Error occured capturing: {e}");
+                tracing::error!("Error occurred capturing: {e}");
             }
         }
         CAPTURER_STATE.store(0, std::sync::atomic::Ordering::Relaxed);
