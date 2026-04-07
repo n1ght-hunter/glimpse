@@ -13,6 +13,7 @@ thiserror.workspace = true
 core-graphics-helmer-fork = "0.24.0"
 cocoa = "0.25.0"
 objc = "0.2.7"
+sysinfo.workspace = true
 cidre = { version = "0.10.1", default-features = false, features = [
     "async",
     "av",

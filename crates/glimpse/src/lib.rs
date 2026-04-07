@@ -14,6 +14,14 @@ pub use glimpse_core::*;
 #[cfg(all(target_os = "windows", feature = "screen"))]
 pub use glimpse_scap_win as screen;
 
+/// Screen capture backend for the current platform.
+#[cfg(all(target_os = "macos", feature = "screen"))]
+pub use glimpse_scap_mac as screen;
+
+/// Screen capture backend for the current platform.
+#[cfg(all(target_os = "linux", feature = "screen"))]
+pub use glimpse_scap_linux as screen;
+
 /// Game capture backend (OBS graphics-hook, Windows only).
 #[cfg(all(target_os = "windows", feature = "game"))]
 pub use glimpse_obs_hook as game;

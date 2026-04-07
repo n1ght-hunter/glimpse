@@ -1,8 +1,13 @@
 [workspace]
 resolver = "3"
 members = ["crates/*"]
-# Platform-specific crates that can't build on all hosts
-exclude = ["crates/scap-mac", "crates/scap-linux"]
+default-members = [
+    "crates/core",
+    "crates/glimpse",
+    "crates/obs-hook",
+    "crates/scap",
+    "crates/scap-win",
+]
 
 [workspace.package]
 edition = "2024"

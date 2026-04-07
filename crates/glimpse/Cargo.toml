@@ -12,7 +12,13 @@ glimpse_core.workspace = true
 glimpse_scap_win = { workspace = true, optional = true }
 glimpse_obs_hook = { workspace = true, optional = true, features = ["core"] }
 
+[target.'cfg(target_os = "macos")'.dependencies]
+glimpse_scap_mac = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+glimpse_scap_linux = { workspace = true, optional = true }
+
 [features]
 default = ["screen"]
-screen = ["glimpse_scap_win"]
+screen = ["glimpse_scap_win", "glimpse_scap_mac", "glimpse_scap_linux"]
 game = ["glimpse_obs_hook"]
