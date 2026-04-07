@@ -599,6 +599,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "glimpse_core"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "glimpse_obs_hook"
 version = "0.1.0"
 dependencies = [

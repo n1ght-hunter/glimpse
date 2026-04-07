@@ -8,6 +8,7 @@ license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
 # Local crates
+glimpse_core = { path = "crates/core" }
 glimpse_scap = { path = "crates/scap" }
 glimpse_obs_hook = { path = "crates/obs-hook" }
 
