@@ -50,8 +50,7 @@ pub enum WinCaptureError {
 impl WinScreenCapture {
     pub fn new(options: WinCaptureOptions) -> Result<Self, WinCaptureError> {
         let (tx, rx) = mpsc::channel();
-        let engine =
-            engine::create_capturer(&options, tx).map_err(WinCaptureError::Create)?;
+        let engine = engine::create_capturer(&options, tx).map_err(WinCaptureError::Create)?;
 
         Ok(Self {
             engine,

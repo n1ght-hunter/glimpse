@@ -10,15 +10,15 @@ mod pixelformat;
 pub mod platform;
 pub mod targets;
 
+use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc;
-use std::sync::Arc;
 
 use cidre::{arc, cm, sc};
 
+use glimpse_core::Target;
 use glimpse_core::capture::CaptureStream;
 use glimpse_core::frame::{Frame, FrameType};
-use glimpse_core::Target;
 
 pub use ext::DirectDisplayIdExt;
 pub use platform::MacPlatform;
@@ -86,10 +86,7 @@ impl MacScreenCapture {
         use std::time::Duration;
 
         loop {
-            if self
-                .error_flag
-                .load(std::sync::atomic::Ordering::Relaxed)
-            {
+            if self.error_flag.load(std::sync::atomic::Ordering::Relaxed) {
                 return Err(mpsc::RecvError);
             }
 
@@ -118,10 +115,7 @@ impl CaptureStream for MacScreenCapture {
                 .recv()
                 .map_err(|_| MacCaptureError::ChannelDisconnected)?;
 
-            if self
-                .error_flag
-                .load(std::sync::atomic::Ordering::Relaxed)
-            {
+            if self.error_flag.load(std::sync::atomic::Ordering::Relaxed) {
                 return Err(MacCaptureError::StreamError);
             }
 

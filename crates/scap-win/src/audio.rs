@@ -41,11 +41,11 @@ fn build_audio_stream(
     >,
 ) -> Result<(cpal::Stream, cpal::SupportedStreamConfig), CreateAudioError> {
     let host = cpal::default_host();
-    let output_device =
-        host.default_output_device()
-            .ok_or(CreateAudioError::AudioStreamConfig(
-                cpal::DefaultStreamConfigError::DeviceNotAvailable,
-            ))?;
+    let output_device = host
+        .default_output_device()
+        .ok_or(CreateAudioError::AudioStreamConfig(
+            cpal::DefaultStreamConfigError::DeviceNotAvailable,
+        ))?;
     let supported_config = output_device
         .default_output_config()
         .map_err(CreateAudioError::AudioStreamConfig)?;
@@ -116,16 +116,16 @@ pub fn spawn_audio_stream(
                 Err(_) => return,
             };
 
-            let (data, _info, timestamp) =
-                match sample_rx.recv_timeout(Duration::from_millis(100)) {
-                    Ok(Ok(data)) => data,
-                    Err(RecvTimeoutError::Timeout) => {
-                        continue;
-                    }
-                    _ => {
-                        return;
-                    }
-                };
+            let (data, _info, timestamp) = match sample_rx.recv_timeout(Duration::from_millis(100))
+            {
+                Ok(Ok(data)) => data,
+                Err(RecvTimeoutError::Timeout) => {
+                    continue;
+                }
+                _ => {
+                    return;
+                }
+            };
 
             let sample_count =
                 data.len() / (audio_format.sample_size() * config.channels() as usize);

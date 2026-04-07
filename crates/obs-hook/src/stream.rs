@@ -47,10 +47,7 @@ impl CaptureStream for ObsGameCapture {
             // caller inspect the raw bytes. The pixel layout may differ but
             // dimensions and data are valid.
             _ => {
-                tracing::warn!(
-                    format = raw.format,
-                    "unknown DXGI format, wrapping as BGRA"
-                );
+                tracing::warn!(format = raw.format, "unknown DXGI format, wrapping as BGRA");
                 VideoFrame::BGRA(BGRAFrame {
                     display_time: SystemTime::now(),
                     width: raw.width as i32,

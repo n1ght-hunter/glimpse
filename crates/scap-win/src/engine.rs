@@ -1,7 +1,7 @@
 use ::windows::Win32::System::Performance::{QueryPerformanceCounter, QueryPerformanceFrequency};
+use glimpse_core::Target;
 use glimpse_core::frame::{BGRAFrame, Frame, FrameType, RGBxFrame, VideoFrame};
 use glimpse_core::geometry::{Area, Point, Resolution, Size};
-use glimpse_core::Target;
 use std::sync::mpsc;
 use std::time::SystemTime;
 use std::{cmp, time::Duration};
@@ -17,11 +17,9 @@ use windows_capture::{
     window::Window as WCWindow,
 };
 
-use crate::audio::{
-    spawn_audio_stream, AudioStreamControl, AudioStreamHandle, CreateAudioError,
-};
-use crate::targets::{self, DisplayExt, WindowExt};
 use crate::WinCaptureOptions;
+use crate::audio::{AudioStreamControl, AudioStreamHandle, CreateAudioError, spawn_audio_stream};
+use crate::targets::{self, DisplayExt, WindowExt};
 
 #[derive(Debug)]
 struct FrameHandler {

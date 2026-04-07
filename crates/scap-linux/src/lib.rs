@@ -5,9 +5,9 @@
 
 mod engine;
 pub mod error;
+pub mod platform;
 pub mod portal;
 pub mod targets;
-pub mod platform;
 
 use std::sync::mpsc;
 

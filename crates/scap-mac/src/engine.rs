@@ -10,12 +10,12 @@ use cidre::{
 };
 use futures::executor::block_on;
 
+use glimpse_core::Target;
 use glimpse_core::frame::{AudioFormat, AudioFrame, BGRAFrame, Frame, FrameType, VideoFrame};
 use glimpse_core::geometry::{Area, Point, Resolution, Size};
-use glimpse_core::Target;
 
 use crate::targets::{DisplayExt, WindowExt};
-use crate::{targets, ChannelItem, MacCaptureOptions};
+use crate::{ChannelItem, MacCaptureOptions, targets};
 
 struct ErrorHandlerInner {
     error_flag: Arc<AtomicBool>,

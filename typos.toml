@@ -1,0 +1,9 @@
+[default.extend-identifiers]
+# PipeWire spa_buffer field name
+n_datas = "n_datas"
+
+[default.extend-words]
+# cidre mach_timebase field
+numer = "numer"
+# PipeWire spa_buffer field
+datas = "datas"

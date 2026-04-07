@@ -30,9 +30,8 @@ use pw::{
 };
 
 use glimpse_core::{
-    CaptureOptions,
+    CaptureOptions, Frame,
     frame::{BGRxFrame, RGBFrame, RGBxFrame, VideoFrame, XBGRFrame},
-    Frame,
 };
 
 use crate::{error::LinCapError, portal::ScreenCastPortal};
@@ -159,26 +158,18 @@ fn process_callback(stream: &StreamRef, user_data: &mut ListenerUserData) {
                     height: frame_size.height as i32,
                     data: frame_data,
                 }))),
-                VideoFormat::xBGR => {
-                    user_data
-                        .tx
-                        .send(Frame::Video(VideoFrame::XBGR(XBGRFrame {
-                            display_time,
-                            width: frame_size.width as i32,
-                            height: frame_size.height as i32,
-                            data: frame_data,
-                        })))
-                }
-                VideoFormat::BGRx => {
-                    user_data
-                        .tx
-                        .send(Frame::Video(VideoFrame::BGRx(BGRxFrame {
-                            display_time,
-                            width: frame_size.width as i32,
-                            height: frame_size.height as i32,
-                            data: frame_data,
-                        })))
-                }
+                VideoFormat::xBGR => user_data.tx.send(Frame::Video(VideoFrame::XBGR(XBGRFrame {
+                    display_time,
+                    width: frame_size.width as i32,
+                    height: frame_size.height as i32,
+                    data: frame_data,
+                }))),
+                VideoFormat::BGRx => user_data.tx.send(Frame::Video(VideoFrame::BGRx(BGRxFrame {
+                    display_time,
+                    width: frame_size.width as i32,
+                    height: frame_size.height as i32,
+                    data: frame_data,
+                }))),
                 _ => panic!("Unsupported frame format received"),
             } {
                 tracing::error!("Failed to send frame: {e}");
