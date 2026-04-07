@@ -1,0 +1,15 @@
+[package]
+name = "glimpse_obs_hook"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+description = "OBS graphics-hook based game frame capture"
+
+[dependencies]
+windows.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+toml.workspace = true
+serde.workspace = true
+ureq.workspace = true
+zip.workspace = true
