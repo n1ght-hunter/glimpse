@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+
+  ci:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+          - name: Linux
+            os: ubuntu-latest
+            packages: -p glimpse_core -p glimpse_scap_linux
+            deps: sudo apt-get update && sudo apt-get install -y libpipewire-0.3-dev libdbus-1-dev
+          - name: macOS
+            os: macos-latest
+            packages: -p glimpse_core -p glimpse_scap_mac
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install system dependencies
+        if: matrix.deps
+        run: ${{ matrix.deps }}
+      - name: Install Rust toolchain
+        run: rustup show
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Clippy
+        run: cargo clippy --all-targets ${{ matrix.packages }} -- -D warnings
+      - name: Test
+        run: cargo test ${{ matrix.packages }}
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        run: rustup show
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+  typos:
+    name: Typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Check spelling
+        uses: crate-ci/typos@master
